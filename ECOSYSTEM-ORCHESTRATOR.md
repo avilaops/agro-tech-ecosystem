@@ -13,6 +13,26 @@ Este documento coordena **16+ projetos** que formam um ecossistema integrado par
 
 ---
 
+## 🔗 MUDANÇA DE PARADIGMA
+
+> **"O problema não é gerenciar projetos. É gerenciar dependências entre projetos."**
+
+### ❌ Sistema tradicional gerencia: tarefas, issues, commits
+### ✅ **Orquestração real gerencia: quem depende de quem, quem trava quem, quem está pronto pra integrar**
+
+**Documentos críticos:**
+* **[DEPENDENCY-CONTROL.md](DEPENDENCY-CONTROL.md)** — Mapa de dependências, gargalos, contratos de dados
+* **[INTEGRATION-MATRIX.md](INTEGRATION-MATRIX.md)** — Matriz de integração entre projetos
+* **[GOVERNANCE.md](GOVERNANCE.md)** — Processo de trabalho e Definition of Done
+
+**Primeira ação:** Issue #1 em cada um dos 17 repos: `[ECOSYSTEM INIT] Definir contrato de dados do projeto`
+
+**Contrato de dados = O que recebe + O que produz + Formato + Frequência**
+
+Sem contrato definido, nenhuma integração começa.
+
+---
+
 ## 🧠 ARQUITETURA DO ECOSSISTEMA
 
 ```
@@ -505,6 +525,7 @@ Para ativar a orquestração:
 
 ### 🎯 Documentos Mestres:
 * **[ECOSYSTEM-ORCHESTRATOR.md](ECOSYSTEM-ORCHESTRATOR.md)** — Este documento (arquitetura + visão)
+* **[DEPENDENCY-CONTROL.md](DEPENDENCY-CONTROL.md)** — ⭐ **NOVO** Mapa de dependências + contratos + gargalos
 * **[INTEGRATION-MATRIX.md](INTEGRATION-MATRIX.md)** — Matriz de dependências + ordem de implementação
 * **[ROADMAP-2026.md](ROADMAP-2026.md)** — Cronograma sincronizado Q1-Q4
 
