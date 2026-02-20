@@ -177,6 +177,85 @@ Este documento coordena **16+ projetos** que formam um ecossistema integrado par
 
 ---
 
+## ⚙️ GOVERNANÇA & PROCESSO DE TRABALHO
+
+### 📋 Como Funciona a Orquestração na Prática
+
+Todo trabalho no ecossistema segue um **ciclo de 5 fases**:
+
+**1. INTAKE** → Ideia/demanda vira Issue com template  
+**2. SPEC** → 1 página de especificação (objetivo, inputs, outputs, aceite)  
+**3. BUILD** → Código + testes + docs  
+**4. RELEASE** → Merge + tag + changelog  
+**5. FEEDBACK** → Post-mortem + métricas  
+
+**Regra de ouro:** 📌 **Nenhum trabalho entra em "In Progress" sem critério de aceite escrito**
+
+---
+
+### 🏷️ As 4 Camadas Fixas
+
+Toda demanda se encaixa em UMA camada:
+
+* **DECISION** — Analytics, ROI, recomendações (Precision-Platform, Intelligence)
+* **SENSING** — Visão, sensores, ingest (AI-Vision, MicroBot)
+* **EXECUTION** — Máquinas, robôs, atuação (AgriBot, MicroBot, Swarm)
+* **INFRA** — APIs, dados, energia, DevOps (Solar, MicroGrid, Marketplace)
+
+Isso garante balanceamento: nenhuma camada sobrecarregada ou esquecida.
+
+---
+
+### ✅ Definition of Done (DoD)
+
+Nada está "Done" sem:
+
+- [ ] **Roda** — funciona localmente sem erros
+- [ ] **Exemplo** — tem exemplo de uso (README, script, ou notebook)
+- [ ] **Teste mínimo** — pelo menos 1 teste (unitário ou integração)
+- [ ] **Release notes** — changelog ou descrição do que mudou
+
+Para integrações, adicione:
+- [ ] **Contrato definido** — API spec ou formato documentado
+- [ ] **README atualizado** — em ambos os projetos
+- [ ] **Fluxo completo** — 1 caso end-to-end funcional
+
+---
+
+### 📊 GitHub Project Central
+
+**Controle único** de todos os 16+ repositórios:
+
+* **5 views:** Board (diário), Roadmap (semanal), By Layer (balanço), Blocked (gargalos), This Week (foco)
+* **7 custom fields:** Status, Priority, Layer, Quarter, Effort, Impact, Blocked By
+* **40+ labels padronizadas:** TYPE, LAYER, PRIORITY, STATUS, QUARTER, EFFORT, IMPACT, REPO
+
+**Documentação completa:**
+* 📘 [GOVERNANCE.md](GOVERNANCE.md) — Processo detalhado, cadência, métricas
+* 📘 [GITHUB-PROJECTS-SETUP.md](GITHUB-PROJECTS-SETUP.md) — Guia de configuração passo a passo
+* 📘 [FIRST-7-ISSUES-P0.md](FIRST-7-ISSUES-P0.md) — Primeiras issues para começar
+
+---
+
+### 🚦 Primeiras 7 Issues P0
+
+Para ativar a orquestração:
+
+**Infra (4 issues):**
+1. Criar taxonomia de labels (XS)
+2. Criar templates de issue (S)
+3. Configurar GitHub Project central (M)
+4. Documentar Definition of Done (XS)
+
+**Primeiro Ciclo Q1 (3 issues):**
+5. Precision Platform: Ingest + Report skeleton (L)
+6. AI-Vision: Pipeline placeholder + interface (M)
+7. AgriBot: Spec de telemetria (S)
+
+**Objetivo:** Em 4 semanas ter governança + 3 contratos de integração + 1 MVP funcional.
+
+---
+
 ## 🚀 ROADMAP GLOBAL SINCRONIZADO
 
 ### 🎯 Q1 2026 — MVP FUNCIONAL (atual)
@@ -411,13 +490,36 @@ Este documento coordena **16+ projetos** que formam um ecossistema integrado par
 
 **Data:** 20/02/2026
 
-**Fase:** MVP dos 4 projetos core em desenvolvimento
+**Fase:** Orquestração ativada — Governança pronta, primeiras issues P0 definidas
 
 **Próximos passos:**
-1. Atualizar READMEs dos 12 projetos restantes
-2. Criar diagramas de arquitetura técnica
-3. Definir APIs de integração
-4. Começar código do MVP Precision-Platform (cana)
+1. ✅ Aplicar labels em todos os repos (`scripts/setup-labels.ps1`)
+2. ✅ Copiar templates de issue para todos os repos
+3. ⏳ Configurar GitHub Project Central
+4. ⏳ Criar as 7 issues P0 iniciais
+5. ⏳ Começar código dos MVPs (Precision, AI-Vision, AgriBot)
+
+---
+
+## 📚 DOCUMENTAÇÃO COMPLETA
+
+### 🎯 Documentos Mestres:
+* **[ECOSYSTEM-ORCHESTRATOR.md](ECOSYSTEM-ORCHESTRATOR.md)** — Este documento (arquitetura + visão)
+* **[INTEGRATION-MATRIX.md](INTEGRATION-MATRIX.md)** — Matriz de dependências + ordem de implementação
+* **[ROADMAP-2026.md](ROADMAP-2026.md)** — Cronograma sincronizado Q1-Q4
+
+### ⚙️ Governança & Processo:
+* **[GOVERNANCE.md](GOVERNANCE.md)** — Processo de trabalho, DoD, labels, cadência
+* **[GITHUB-PROJECTS-SETUP.md](GITHUB-PROJECTS-SETUP.md)** — Guia de setup do Project central
+* **[FIRST-7-ISSUES-P0.md](FIRST-7-ISSUES-P0.md)** — Primeiras issues para começar
+
+### 🧰 Scripts & Ferramentas:
+* **[scripts/setup-labels.ps1](scripts/setup-labels.ps1)** — Aplicar labels em todos os repos
+* **[.github/ISSUE_TEMPLATE/](. github/ISSUE_TEMPLATE/)** — Templates de issues
+
+### 📊 Portfólio & Negócios:
+* **[PORTFOLIO-EXECUTIVO.md](PORTFOLIO-EXECUTIVO.md)** — Documento corporativo completo
+* **[PROJETOS-INDEX.md](PROJETOS-INDEX.md)** — Índice de todos os projetos
 
 ---
 
