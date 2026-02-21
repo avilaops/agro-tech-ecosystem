@@ -1,0 +1,375 @@
+{
+  "simulation_id": "SIM-SESSION-20260220-170000",
+  "timestamp": "2026-02-20T17:00:00.000Z",
+  "config": {
+    "timestep_seconds": 0.1,
+    "duration_seconds": 600,
+    "physics_enabled": true,
+    "collision_detection": true,
+    "weather_simulation": true,
+    "solar_simulation": true,
+    "realtime_factor": 1.0
+  },
+  "environment": {
+    "terrain": {
+      "area_ha": 850,
+      "bounds": {
+        "lat_min": -22.7200,
+        "lat_max": -22.7100,
+        "lon_min": -47.6550,
+        "lon_max": -47.6450
+      },
+      "elevation": {
+        "type": "heightmap",
+        "min_m": 580,
+        "max_m": 610,
+        "resolution_m": 1.0
+      },
+      "friction_coefficient": 0.6,
+      "slope_avg_deg": 2.5,
+      "obstacles": [
+        {"type": "rock", "position": {"lat": -22.7150, "lon": -47.6500}, "radius_m": 0.8},
+        {"type": "tree", "position": {"lat": -22.7130, "lon": -47.6480}, "radius_m": 1.2}
+      ]
+    },
+    "plantation": {
+      "crop": "sugarcane",
+      "area_planted_ha": 780,
+      "row_spacing_m": 1.5,
+      "plant_spacing_m": 0.5,
+      "density_plants_per_ha": 13333,
+      "total_plants": 10400000,
+      "maturity": {
+        "avg_percent": 78,
+        "std_dev": 12,
+        "distribution": {
+          "immature_0_60": 15,
+          "developing_60_75": 20,
+          "optimal_75_85": 50,
+          "overripe_85_100": 15
+        }
+      },
+      "height_avg_m": 3.2,
+      "biomass_kg_per_ha": 85000
+    },
+    "weather": {
+      "temperature_c": 28,
+      "humidity_percent": 65,
+      "wind_speed_ms": 3.5,
+      "wind_direction_deg": 90,
+      "precipitation_mm_per_hour": 0,
+      "cloud_cover_percent": 30,
+      "conditions": "partly_cloudy"
+    },
+    "solar": {
+      "date": "2026-02-20",
+      "time": "17:00:00",
+      "latitude": -22.715,
+      "sun_elevation_deg": 25.3,
+      "sun_azimuth_deg": 285.7,
+      "irradiance_w_per_m2": 420,
+      "daylight_hours_total": 13.2,
+      "sunrise": "06:15:00",
+      "sunset": "19:27:00"
+    }
+  },
+  "robots": [
+    {
+      "robot_id": "MICROBOT-001",
+      "type": "harvester",
+      "state": {
+        "position": {
+          "lat": -22.7150,
+          "lon": -47.6500,
+          "altitude_m": 595.2,
+          "heading_deg": 90.0
+        },
+        "velocity": {
+          "linear_ms": 0.5,
+          "angular_deg_per_s": 0.0
+        },
+        "acceleration": {
+          "linear_ms2": 0.0,
+          "angular_deg_per_s2": 0.0
+        },
+        "battery": {
+          "soc_percent": 48,
+          "voltage_v": 48.2,
+          "current_a": 12.5,
+          "temperature_c": 38,
+          "capacity_ah": 100,
+          "charging": true,
+          "cycles": 145
+        },
+        "actuators": {
+          "left_motor": {
+            "rpm": 120,
+            "power_w": 450,
+            "torque_nm": 35.8,
+            "temperature_c": 55
+          },
+          "right_motor": {
+            "rpm": 118,
+            "power_w": 445,
+            "torque_nm": 35.5,
+            "temperature_c": 54
+          },
+          "blade": {
+            "active": false,
+            "rpm": 0,
+            "power_w": 0
+          },
+          "steering": {
+            "angle_deg": -2.5,
+            "servo_position_percent": 48.75
+          }
+        },
+        "sensors": {
+          "gps": {
+            "fix": "3D",
+            "accuracy_m": 0.05,
+            "satellites": 18,
+            "noise_m": 0.02
+          },
+          "imu": {
+            "roll_deg": 1.2,
+            "pitch_deg": -0.8,
+            "yaw_deg": 90.3,
+            "gyro_noise_deg_per_s": 0.1
+          },
+          "lidar": {
+            "range_m": 50,
+            "points_per_scan": 300000,
+            "fov_deg": 360,
+            "obstacles_detected": 2
+          },
+          "camera_front": {
+            "resolution": "1920x1080",
+            "fps": 30,
+            "objects_detected": 5
+          }
+        },
+        "mission": {
+          "mission_id": "MISSION-F001-Z001-20260220",
+          "status": "charging",
+          "progress_percent": 35,
+          "waypoint_current": 28,
+          "waypoint_total": 80,
+          "area_covered_ha": 1.8,
+          "area_remaining_ha": 3.3
+        },
+        "health": {
+          "overall_status": "healthy",
+          "cpu_usage_percent": 45,
+          "memory_usage_percent": 62,
+          "disk_usage_percent": 58,
+          "uptime_hours": 8.5,
+          "network_latency_ms": 25
+        }
+      },
+      "physics": {
+        "mass_kg": 850,
+        "dimensions_m": {"length": 2.5, "width": 1.8, "height": 1.6},
+        "wheel_base_m": 1.5,
+        "wheel_radius_m": 0.35,
+        "max_speed_ms": 2.0,
+        "max_acceleration_ms2": 0.8,
+        "max_angular_velocity_deg_per_s": 45,
+        "drag_coefficient": 0.7,
+        "rolling_resistance": 0.02
+      }
+    },
+    {
+      "robot_id": "MICROBOT-002",
+      "type": "harvester",
+      "state": {
+        "position": {
+          "lat": -22.7140,
+          "lon": -47.6510,
+          "altitude_m": 598.5,
+          "heading_deg": 135.0
+        },
+        "velocity": {
+          "linear_ms": 1.8,
+          "angular_deg_per_s": 5.0
+        },
+        "acceleration": {
+          "linear_ms2": 0.2,
+          "angular_deg_per_s2": 1.0
+        },
+        "battery": {
+          "soc_percent": 78,
+          "voltage_v": 50.8,
+          "current_a": -28.5,
+          "temperature_c": 45,
+          "capacity_ah": 100,
+          "charging": false,
+          "cycles": 128
+        },
+        "actuators": {
+          "left_motor": {
+            "rpm": 180,
+            "power_w": 680,
+            "torque_nm": 36.1,
+            "temperature_c": 62
+          },
+          "right_motor": {
+            "rpm": 160,
+            "power_w": 605,
+            "torque_nm": 36.0,
+            "temperature_c": 60
+          },
+          "blade": {
+            "active": true,
+            "rpm": 850,
+            "power_w": 1200
+          },
+          "steering": {
+            "angle_deg": 12.0,
+            "servo_position_percent": 73.3
+          }
+        },
+        "sensors": {
+          "gps": {
+            "fix": "3D",
+            "accuracy_m": 0.08,
+            "satellites": 16,
+            "noise_m": 0.03
+          },
+          "imu": {
+            "roll_deg": -2.5,
+            "pitch_deg": 3.2,
+            "yaw_deg": 135.8,
+            "gyro_noise_deg_per_s": 0.15
+          },
+          "lidar": {
+            "range_m": 50,
+            "points_per_scan": 300000,
+            "fov_deg": 360,
+            "obstacles_detected": 8
+          },
+          "camera_front": {
+            "resolution": "1920x1080",
+            "fps": 30,
+            "objects_detected": 12
+          }
+        },
+        "mission": {
+          "mission_id": "MISSION-F001-Z002-20260220",
+          "status": "harvesting",
+          "progress_percent": 62,
+          "waypoint_current": 62,
+          "waypoint_total": 100,
+          "area_covered_ha": 3.1,
+          "area_remaining_ha": 1.9
+        },
+        "health": {
+          "overall_status": "healthy",
+          "cpu_usage_percent": 78,
+          "memory_usage_percent": 71,
+          "disk_usage_percent": 62,
+          "uptime_hours": 9.2,
+          "network_latency_ms": 32
+        }
+      },
+      "physics": {
+        "mass_kg": 850,
+        "dimensions_m": {"length": 2.5, "width": 1.8, "height": 1.6},
+        "wheel_base_m": 1.5,
+        "wheel_radius_m": 0.35,
+        "max_speed_ms": 2.0,
+        "max_acceleration_ms2": 0.8,
+        "max_angular_velocity_deg_per_s": 45,
+        "drag_coefficient": 0.7,
+        "rolling_resistance": 0.02
+      }
+    },
+    {
+      "robot_id": "SUPPORTBOT-001",
+      "type": "transport",
+      "state": {
+        "position": {
+          "lat": -22.7160,
+          "lon": -47.6490,
+          "altitude_m": 592.0,
+          "heading_deg": 270.0
+        },
+        "velocity": {
+          "linear_ms": 2.2,
+          "angular_deg_per_s": 0.0
+        },
+        "battery": {
+          "soc_percent": 68,
+          "voltage_v": 49.8,
+          "current_a": -17.8,
+          "temperature_c": 42,
+          "capacity_ah": 120,
+          "charging": false,
+          "cycles": 98
+        },
+        "cargo": {
+          "loaded": true,
+          "mass_kg": 450,
+          "capacity_kg": 800,
+          "utilization_percent": 56.3
+        },
+        "mission": {
+          "mission_id": "MISSION-TRANSPORT-002",
+          "status": "transporting",
+          "progress_percent": 72,
+          "destination": {"lat": -22.7180, "lon": -47.6470}
+        },
+        "health": {
+          "overall_status": "healthy",
+          "cpu_usage_percent": 35,
+          "memory_usage_percent": 48,
+          "uptime_hours": 7.8
+        }
+      },
+      "physics": {
+        "mass_kg": 650,
+        "dimensions_m": {"length": 2.0, "width": 1.5, "height": 1.2},
+        "wheel_base_m": 1.2,
+        "wheel_radius_m": 0.30,
+        "max_speed_ms": 3.0,
+        "max_acceleration_ms2": 1.2,
+        "rolling_resistance": 0.018
+      }
+    }
+  ],
+  "events": [
+    {
+      "timestamp": "2026-02-20T16:55:23.000Z",
+      "type": "collision_detected",
+      "robot_id": "MICROBOT-002",
+      "severity": "minor",
+      "object": "sugarcane_stalk",
+      "impact_force_n": 85,
+      "damage": false
+    },
+    {
+      "timestamp": "2026-02-20T16:48:15.000Z",
+      "type": "charging_started",
+      "robot_id": "MICROBOT-001",
+      "station_id": "STATION-001",
+      "soc_initial_percent": 32
+    },
+    {
+      "timestamp": "2026-02-20T16:30:00.000Z",
+      "type": "weather_change",
+      "from": "sunny",
+      "to": "partly_cloudy",
+      "cloud_cover_change": 30
+    }
+  ],
+  "statistics": {
+    "total_timesteps": 0,
+    "elapsed_time_seconds": 0,
+    "total_distance_traveled_km": 12.8,
+    "total_energy_consumed_kwh": 18.5,
+    "total_area_harvested_ha": 8.2,
+    "average_efficiency_ha_per_kwh": 0.44,
+    "collisions": 3,
+    "charging_sessions": 2
+  }
+}

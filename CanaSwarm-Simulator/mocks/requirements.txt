@@ -1,0 +1,53 @@
+# CanaSwarm Simulator - Production Dependencies
+
+# Core simulation
+# numpy>=1.24.3          # Numerical operations (matrix math, physics)
+# scipy>=1.11.0          # Advanced physics (ODE solvers, optimization)
+
+# 3D Graphics & Rendering
+# pygame>=2.5.0          # 2D visualization and input
+# panda3d>=1.10.13       # 3D rendering engine
+# pyopengl>=3.1.7        # OpenGL bindings
+# moderngl>=5.8.2        # Modern OpenGL wrapper
+
+# Physics Simulation
+# pybullet>=3.2.5        # Real physics engine (rigid body, collisions)
+# pymunk>=6.5.1          # 2D physics (alternative lightweight)
+
+# Robotics & Control
+# control>=0.9.4         # Control theory (PID, LQR)
+# filterpy>=1.4.5        # Kalman filters (sensor fusion)
+
+# Environment & Weather
+# pvlib>=0.10.2          # Solar position and irradiance calculations
+# metpy>=1.5.1           # Meteorological calculations
+
+# Terrain & GIS
+# rasterio>=1.3.8        # Raster data (heightmaps, satellite imagery)
+# shapely>=2.0.1         # Geometric operations
+# pyproj>=3.6.0          # Coordinate transformations
+
+# Data & Logging
+# pandas>=2.0.3          # Data analysis
+# h5py>=3.9.0            # HDF5 format (large simulation datasets)
+
+# Visualization & Analysis
+# matplotlib>=3.7.2      # 2D plots
+# plotly>=5.16.1         # Interactive 3D plots
+# opencv-python>=4.8.0   # Computer vision (camera simulation)
+
+# Testing & Benchmarking
+# pytest>=7.4.0          # Unit testing
+# pytest-benchmark>=4.0.0  # Performance benchmarking
+
+# Multi-processing
+# multiprocessing-logging>=0.3.4  # Logging across processes
+# ray>=2.6.3             # Distributed computing (multi-robot sims)
+
+# Configuration
+# pyyaml>=6.0.1          # YAML config files
+# python-dotenv>=1.0.0   # Environment variables
+
+# NOTE: Current mock uses only Python stdlib for portability
+# Install above packages for full production simulation with:
+#   pip install -r requirements.txt
