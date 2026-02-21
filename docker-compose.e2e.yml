@@ -1,0 +1,68 @@
+# Docker Compose for E2E Testing
+# 
+# Usage:
+#   docker-compose -f docker-compose.e2e.yml up -d --build
+#   python integration/test_precision_to_intelligence.py
+#   docker-compose -f docker-compose.e2e.yml down -v
+#
+# Or use Makefile:
+#   make e2e
+
+version: '3.8'
+
+services:
+  precision-api:
+    build:
+      context: ../Precision-Agriculture-Platform
+      dockerfile: Dockerfile
+    image: precision-api:test
+    container_name: precision-api-e2e
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ENV=test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/v1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - agro-test-net
+    restart: "no"
+
+  intelligence-api:
+    build:
+      context: ../CanaSwarm-Intelligence
+      dockerfile: Dockerfile
+    image: intelligence-api:test
+    container_name: intelligence-api-e2e
+    ports:
+      - "6000:6000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ENV=test
+    depends_on:
+      precision-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/api/v1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - agro-test-net
+    restart: "no"
+    volumes:
+      - intelligence-data:/app/data
+
+networks:
+  agro-test-net:
+    driver: bridge
+    name: agro-test-network
+
+volumes:
+  intelligence-data:
+    name: intelligence-test-data
