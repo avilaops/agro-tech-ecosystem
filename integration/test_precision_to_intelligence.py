@@ -16,6 +16,11 @@ Requirements:
 import sys
 import logging
 from datetime import datetime
+from pathlib import Path
+
+# Add project root to Python path for adapter imports
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 # Import our official adapter
 from adapters.precision_intelligence import (
