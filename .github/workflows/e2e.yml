@@ -58,13 +58,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pytest pytest-timeout
       
+      - name: � Debug docker compose configuration
+        working-directory: workspace/agro-tech-ecosystem
+        run: |
+          echo "=== Docker Compose Config Validation ==="
+          docker compose -f docker-compose.e2e.yml config
+          echo ""
+          echo "=== Build Context Check ==="
+          ls -la ../Precision-Agriculture-Platform/ | head -20 || echo "Precision path not found"
+          ls -la ../CanaSwarm-Intelligence/ | head -20 || echo "Intelligence path not found"
+      
       - name: 🚀 Start services with Docker Compose
         working-directory: workspace/agro-tech-ecosystem
         env:
           DOCKER_BUILDKIT: '1'
         run: |
           docker compose -f docker-compose.e2e.yml up -d --build
+          echo ""
+          echo "=== Services Started ==="
           docker compose -f docker-compose.e2e.yml ps
+          echo ""
+          echo "=== Initial Logs (first 50 lines) ==="
+          docker compose -f docker-compose.e2e.yml logs --tail=50
       
       - name: ⏳ Wait for services to be healthy
         working-directory: workspace/agro-tech-ecosystem
@@ -89,6 +104,21 @@ jobs:
           echo "  Intelligence API: $INTELLIGENCE_ID"
           echo ""
           
+          # Check if containers are running first
+          PRECISION_RUNNING=$(docker inspect --format='{{.State.Running}}' "$PRECISION_ID" 2>/dev/null || echo "false")
+          INTELLIGENCE_RUNNING=$(docker inspect --format='{{.State.Running}}' "$INTELLIGENCE_ID" 2>/dev/null || echo "false")
+          
+          echo "  Precision Running: $PRECISION_RUNNING"
+          echo "  Intelligence Running: $INTELLIGENCE_RUNNING"
+          echo ""
+          
+          if [ "$PRECISION_RUNNING" != "true" ] || [ "$INTELLIGENCE_RUNNING" != "true" ]; then
+            echo "❌ One or more containers not running!"
+            docker compose -f docker-compose.e2e.yml ps
+            docker compose -f docker-compose.e2e.yml logs
+            exit 1
+          fi
+          
           while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
             ATTEMPT=$((ATTEMPT+1))
             echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
@@ -105,11 +135,26 @@ jobs:
               exit 0
             fi
             
+            # Show logs every 10 attempts for debugging unhealthy state
+            if [ $((ATTEMPT % 10)) -eq 0 ]; then
+              echo ""
+              echo "--- Precision API recent logs ---"
+              docker compose -f docker-compose.e2e.yml logs --tail=10 precision-api
+              echo ""
+              echo "--- Intelligence API recent logs ---"
+              docker compose -f docker-compose.e2e.yml logs --tail=10 intelligence-api
+              echo ""
+            fi
+            
             sleep 2
           done
           
           echo "❌ Services failed to become healthy after $MAX_ATTEMPTS attempts"
+          echo ""
+          echo "=== Final Container Status ==="
           docker compose -f docker-compose.e2e.yml ps
+          echo ""
+          echo "=== Complete Logs ==="
           docker compose -f docker-compose.e2e.yml logs
           exit 1
       
