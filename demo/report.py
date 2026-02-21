@@ -212,59 +212,61 @@ HTML_TEMPLATE = """
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Field</div>
-                    <div class="stat-value">{{ decision.field_id }}</div>
+                    <div class="stat-value">{{ decision['field_id'] }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Priority</div>
                     <div class="stat-value">
-                        <span class="priority-badge priority-{{ decision.priority.level }}">
-                            {{ decision.priority.level.upper() }}
+                        <span class="priority-badge priority-{{ decision['priority']['level'] | default('unknown') }}">
+                            {{ (decision['priority']['level'] | default('unknown')).upper() }}
                         </span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Priority Score</div>
-                    <div class="stat-value">{{ "%.1f"|format(decision.priority.score) }}/10</div>
+                    <div class="stat-value">{{ "%.1f"|format(decision['priority']['score'] | default(0)) }}/10</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Total ROI/year</div>
-                    <div class="stat-value">R$ {{ "{:,}".format(decision.estimated_roi_brl_year) }}</div>
+                    <div class="stat-value">R$ {{ "{:,}".format(decision['estimated_roi_brl_year'] | default(0)) }}</div>
                 </div>
             </div>
             
             <p style="margin-top: 20px; font-size: 1.05em;">
-                <strong>Reason:</strong> {{ decision.priority.reason }}
+                <strong>Reason:</strong> {{ decision['priority']['reason'] | default('No reason provided') }}
             </p>
         </div>
         
         {% if vision_data %}
         <div class="section">
             <h2>👁️ Vision Analysis</h2>
-            <p><strong>Analysis ID:</strong> {{ vision_data.analysis_id }}</p>
-            <p><strong>Crop Health:</strong> {{ vision_data.detections.crop_health.status.upper() }} 
-               (NDVI: {{ "%.2f"|format(vision_data.detections.crop_health.ndvi) }})</p>
+            <p><strong>Analysis ID:</strong> {{ vision_data['analysis_id'] | default('N/A') }}</p>
+            {% if vision_data['detections'] and vision_data['detections']['crop_health'] %}
+            <p><strong>Crop Health:</strong> {{ (vision_data['detections']['crop_health']['status'] | default('unknown')).upper() }} 
+               (NDVI: {{ "%.2f"|format(vision_data['detections']['crop_health']['ndvi'] | default(0)) }})</p>
+            {% endif %}
             
             <div style="margin-top: 15px;">
-                {% if vision_data.detections.weeds %}
-                    {% for weed in vision_data.detections.weeds %}
+                {% if vision_data['detections'] and vision_data['detections']['weeds'] %}
+                    {% for weed in vision_data['detections']['weeds'] %}
                         <span class="detection-badge badge-weed">
-                            🌿 {{ weed.class }} ({{ weed.severity }}, {{ "%.0f"|format(weed.area_m2) }}m²)
+                            🌿 {{ weed['class'] | default('Unknown') }} ({{ weed['severity'] | default('unknown') }}, {{ "%.0f"|format(weed['area_m2'] | default(0)) }}m²)
                         </span>
                     {% endfor %}
                 {% endif %}
                 
-                {% if vision_data.detections.pests %}
-                    {% for pest in vision_data.detections.pests %}
+                {% if vision_data['detections'] and vision_data['detections']['pests'] %}
+                    {% for pest in vision_data['detections']['pests'] %}
                         <span class="detection-badge badge-pest">
-                            🐛 {{ pest.class }} ({{ pest.severity }})
+                            🐛 {{ pest['class'] | default('Unknown') }} ({{ pest['severity'] | default('unknown') }})
                         </span>
                     {% endfor %}
                 {% endif %}
                 
-                {% if vision_data.detections.diseases %}
-                    {% for disease in vision_data.detections.diseases %}
+                {% if vision_data['detections'] and vision_data['detections']['diseases'] %}
+                    {% for disease in vision_data['detections']['diseases'] %}
                         <span class="detection-badge badge-disease">
-                            🦠 {{ disease.class }} ({{ disease.severity }})
+                            🦠 {{ disease['class'] | default('Unknown') }} ({{ disease['severity'] | default('unknown') }})
                         </span>
                     {% endfor %}
                 {% endif %}
@@ -284,16 +286,16 @@ HTML_TEMPLATE = """
                     </tr>
                 </thead>
                 <tbody>
-                    {% for zone in decision.zones %}
+                    {% for zone in decision['zones'] %}
                     <tr>
-                        <td><strong>{{ zone.zone_id }}</strong></td>
+                        <td><strong>{{ zone['zone_id'] }}</strong></td>
                         <td>
-                            <span class="priority-badge priority-{{ zone.priority }}">
-                                {{ zone.priority.upper() }}
+                            <span class="priority-badge priority-{{ zone['priority'] }}">
+                                {{ zone['priority'] | upper }}
                             </span>
                         </td>
-                        <td>{{ zone.action.action.replace('_', ' ').title() }}</td>
-                        <td><strong>R$ {{ "{:,}".format(zone.action.estimated_roi_brl_year) }}</strong></td>
+                        <td>{{ zone['action']['action'].replace('_', ' ').title() }}</td>
+                        <td><strong>R$ {{ "{:,}".format(zone['action']['estimated_roi_brl_year']) }}</strong></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -304,7 +306,7 @@ HTML_TEMPLATE = """
             <h2>📋 Next Steps</h2>
             <div class="next-steps">
                 <ol>
-                    {% for step in decision.next_steps %}
+                    {% for step in decision['next_steps'] %}
                     <li>{{ step }}</li>
                     {% endfor %}
                 </ol>
@@ -341,18 +343,37 @@ def generate_html_report(
     decision = results.get("steps", {}).get("decision", {}).get("data", {})
     vision_data = results.get("steps", {}).get("vision", {}).get("data", {})
     
+    # If decision is empty, create default structure to prevent template errors
+    if not decision or not isinstance(decision, dict):
+        decision = {
+            "field_id": results.get("field_id", "UNKNOWN"),
+            "priority": {"level": "unknown", "score": 0, "reason": "No data available"},
+            "estimated_roi_brl_year": 0,
+            "zones": [],
+            "next_steps": []
+        }
+    
+    # Ensure required fields exist with defaults
+    decision.setdefault("field_id", results.get("field_id", "UNKNOWN"))
+    decision.setdefault("estimated_roi_brl_year", 0)
+    decision.setdefault("zones", [])
+    decision.setdefault("next_steps", [])
+    
+    # Ensure estimated_roi_brl_year is always a number (not None or missing)
+    if decision.get("estimated_roi_brl_year") is None:
+        decision["estimated_roi_brl_year"] = 0
+    
     # Normalize priority field for template compatibility
     if "priority" in decision:
         priority_raw = decision["priority"]
         # Create normalized priority dict for easier Jinja2 access
         priority_normalized = normalize_priority(priority_raw)
-        # Convert to dot-accessible object for Jinja2 template
-        class PriorityObj:
-            def __init__(self, data):
-                self.level = data["level"]
-                self.score = data["score"]
-                self.reason = data["reason"]
-        decision["priority"] = PriorityObj(priority_normalized)
+    else:
+        # No priority data - use defaults
+        priority_normalized = normalize_priority(None)
+    
+    # Set priority as dict (Jinja2 can access dict keys with [] notation)
+    decision["priority"] = priority_normalized
     
     # Prepare template data
     template_data = {
@@ -363,7 +384,14 @@ def generate_html_report(
     
     # Render template
     template = Template(HTML_TEMPLATE)
-    html = template.render(**template_data)
+    try:
+        html = template.render(**template_data)
+    except Exception as e:
+        # Template rendering failed - log details and create fallback
+        import traceback
+        print(f"[ERROR] Template rendering failed: {e}")
+        traceback.print_exc()
+        raise
     
     # Save to file
     output_dir.mkdir(parents=True, exist_ok=True)
