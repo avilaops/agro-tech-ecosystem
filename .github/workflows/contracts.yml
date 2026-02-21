@@ -1,0 +1,178 @@
+name: Contract Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'contracts/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'contracts/**'
+  workflow_dispatch:
+
+jobs:
+  validate-schemas:
+    name: 🔍 Validate JSON Schemas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Install jsonschema validator
+        run: |
+          pip install jsonschema check-jsonschema pytest
+      
+      - name: 🔍 Validate schema structure
+        run: |
+          echo "Validating JSON Schema files..."
+          for schema in contracts/*.schema.json; do
+            if [ -f "$schema" ]; then
+              echo "✓ Checking $schema"
+              python -m json.tool "$schema" > /dev/null || exit 1
+            fi
+          done
+          echo "✅ All schemas are valid JSON"
+      
+      - name: 🧪 Test schemas against examples
+        run: |
+          cat > test_contracts.py << 'EOF'
+          import json
+          import jsonschema
+          from pathlib import Path
+          
+          def test_schema(schema_path):
+              """Test that schema examples validate against the schema."""
+              with open(schema_path) as f:
+                  schema = json.load(f)
+              
+              # Check if schema has examples
+              if "examples" not in schema:
+                  print(f"⚠️  No examples in {schema_path.name}")
+                  return True
+              
+              # Validate each example
+              validator = jsonschema.Draft7Validator(schema)
+              for i, example in enumerate(schema["examples"]):
+                  try:
+                      validator.validate(example)
+                      print(f"✅ Example {i+1} in {schema_path.name} is valid")
+                  except jsonschema.ValidationError as e:
+                      print(f"❌ Example {i+1} in {schema_path.name} failed:")
+                      print(f"   {e.message}")
+                      return False
+              
+              return True
+          
+          # Test all schemas
+          contracts_dir = Path("contracts")
+          all_passed = True
+          
+          for schema_path in contracts_dir.glob("*.schema.json"):
+              print(f"\n{'='*60}")
+              print(f"Testing: {schema_path.name}")
+              print('='*60)
+              if not test_schema(schema_path):
+                  all_passed = False
+          
+          if not all_passed:
+              exit(1)
+          
+          print("\n✅ All contract examples are valid")
+          EOF
+          
+          python test_contracts.py
+      
+      - name: 📋 Generate contract summary
+        if: success()
+        run: |
+          echo "## 📊 Contract Validation Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All JSON Schemas validated successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Contracts Validated:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for schema in contracts/*.schema.json; do
+            if [ -f "$schema" ]; then
+              name=$(basename "$schema")
+              version=$(jq -r '.version // "N/A"' "$schema")
+              title=$(jq -r '.title // "N/A"' "$schema")
+              echo "- **$name** (v$version): $title" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+  
+  check-breaking-changes:
+    name: 🚨 Check for Breaking Changes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📥 Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 📥 Fetch base branch
+        run: |
+          git fetch origin ${{ github.base_ref }}
+      
+      - name: 🔍 Detect breaking changes
+        run: |
+          echo "## 🔍 Contract Change Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for modified contracts
+          modified_contracts=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep 'contracts/.*\.schema\.json' || true)
+          
+          if [ -z "$modified_contracts" ]; then
+            echo "✅ No contract changes detected" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          
+          echo "### Modified Contracts:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$modified_contracts" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Warning about breaking changes
+          echo "### ⚠️ Breaking Change Checklist:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Before merging contract changes, ensure:" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Version number updated (MAJOR.MINOR.PATCH)" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Breaking changes documented in PR description" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Migration path provided (if MAJOR version bump)" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Dependent services notified" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] 30-day deprecation notice posted (if removing fields)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See [contracts/README.md](contracts/README.md) for versioning policy." >> $GITHUB_STEP_SUMMARY
+  
+  validate-cross-repo-sync:
+    name: 🔄 Check Contract Sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📥 Checkout agro-tech-ecosystem
+        uses: actions/checkout@v4
+      
+      - name: 📝 List contract checksums
+        run: |
+          echo "## 📋 Contract Checksums" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Use these to verify contracts are in sync across repos:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cd contracts
+          sha256sum *.schema.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repos to sync:** CanaSwarm-Docs, Agro-Machinery-Marketplace, Industrial-Automation-OS, CanaSwarm-3D-Models" >> $GITHUB_STEP_SUMMARY

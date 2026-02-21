@@ -1,0 +1,126 @@
+name: E2E Integration Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run every 6 hours to catch integration drift
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  e2e-precision-intelligence:
+    name: E2E - Precision → Intelligence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout agro-tech-ecosystem
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 📥 Checkout Precision-Agriculture-Platform
+        uses: actions/checkout@v4
+        with:
+          repository: avilaops/Precision-Agriculture-Platform
+          path: ./services/precision
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 📥 Checkout CanaSwarm-Intelligence
+        uses: actions/checkout@v4
+        with:
+          repository: avilaops/CanaSwarm-Intelligence
+          path: ./services/intelligence
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 📦 Install Precision API dependencies
+        run: |
+          cd services/precision
+          pip install --user -r requirements.txt
+      
+      - name: 📦 Install Intelligence API dependencies
+        run: |
+          cd services/intelligence
+          pip install --user -r requirements.txt
+      
+      - name: 📦 Install E2E test dependencies
+        run: |
+          pip install --user requests pytest pytest-timeout
+      
+      - name: 🚀 Start Precision API (background)
+        run: |
+          cd services/precision
+          nohup python -m uvicorn src.api:app --host 127.0.0.1 --port 5000 > precision.log 2>&1 &
+          echo $! > precision.pid
+          sleep 3
+          # Verify it's running
+          curl -f http://localhost:5000/api/v1/health || (cat precision.log && exit 1)
+      
+      - name: 🚀 Start Intelligence API (background)
+        run: |
+          cd services/intelligence
+          nohup python -m uvicorn src.api:app --host 127.0.0.1 --port 6000 > intelligence.log 2>&1 &
+          echo $! > intelligence.pid
+          sleep 3
+          # Verify it's running
+          curl -f http://localhost:6000/api/v1/health || (cat intelligence.log && exit 1)
+      
+      - name: 🧪 Run E2E Integration Test
+        id: e2e_test
+        run: |
+          python integration/test_precision_to_intelligence.py
+        timeout-minutes: 2
+      
+      - name: 📊 Show API Logs (on failure)
+        if: failure()
+        run: |
+          echo "=== Precision API Logs ==="
+          cat services/precision/precision.log || echo "No logs available"
+          echo ""
+          echo "=== Intelligence API Logs ==="
+          cat services/intelligence/intelligence.log || echo "No logs available"
+      
+      - name: 🛑 Stop services
+        if: always()
+        run: |
+          if [ -f services/precision/precision.pid ]; then
+            kill $(cat services/precision/precision.pid) || true
+          fi
+          if [ -f services/intelligence/intelligence.pid ]; then
+            kill $(cat services/intelligence/intelligence.pid) || true
+          fi
+      
+      - name: 💾 Upload logs as artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-logs
+          path: |
+            services/precision/precision.log
+            services/intelligence/intelligence.log
+          retention-days: 7
+  
+  health-report:
+    name: 📈 Integration Health Report
+    runs-on: ubuntu-latest
+    needs: e2e-precision-intelligence
+    if: always()
+    
+    steps:
+      - name: 📊 Report Status
+        run: |
+          if [ "${{ needs.e2e-precision-intelligence.result }}" == "success" ]; then
+            echo "✅ Ecosystem Integration: HEALTHY"
+            echo "All critical data flows validated successfully."
+          else
+            echo "❌ Ecosystem Integration: DEGRADED"
+            echo "E2E tests failed. Check logs for details."
+            exit 1
+          fi
