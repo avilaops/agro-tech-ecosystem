@@ -55,7 +55,7 @@ jobs:
       - name: 🚀 Start services with Docker Compose
         working-directory: agro-tech-ecosystem
         run: |
-          docker-compose -f docker-compose.e2e.yml up -d --build
+          docker compose -f docker-compose.e2e.yml up -d --build
           echo "Services started, waiting for health checks..."
       
       - name: ⏳ Wait for services to be healthy
@@ -85,8 +85,8 @@ jobs:
           done
           
           echo "❌ Services failed to become healthy after $MAX_ATTEMPTS attempts"
-          docker-compose -f docker-compose.e2e.yml ps
-          docker-compose -f docker-compose.e2e.yml logs
+          docker compose -f docker-compose.e2e.yml ps
+          docker compose -f docker-compose.e2e.yml logs
           exit 1
       
       - name: 🧪 Run E2E Integration Test
@@ -100,19 +100,19 @@ jobs:
         working-directory: agro-tech-ecosystem
         run: |
           echo "=== Docker Compose Status ==="
-          docker-compose -f docker-compose.e2e.yml ps
+          docker compose -f docker-compose.e2e.yml ps
           echo ""
           echo "=== Precision API Logs ==="
-          docker-compose -f docker-compose.e2e.yml logs precision-api
+          docker compose -f docker-compose.e2e.yml logs precision-api
           echo ""
           echo "=== Intelligence API Logs ==="
-          docker-compose -f docker-compose.e2e.yml logs intelligence-api
+          docker compose -f docker-compose.e2e.yml logs intelligence-api
       
       - name: 🛑 Stop services
         if: always()
         working-directory: agro-tech-ecosystem
         run: |
-          docker-compose -f docker-compose.e2e.yml down -v
+          docker compose -f docker-compose.e2e.yml down -v
       
       - name: 💾 Upload logs as artifacts
         if: always()
