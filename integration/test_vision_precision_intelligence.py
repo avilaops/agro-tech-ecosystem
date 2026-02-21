@@ -20,7 +20,7 @@ from datetime import datetime
 
 # API URLs
 PRECISION_API = "http://localhost:5000"
-INTELLIGENCE_API = "http://localhost:6000"
+INTELLIGENCE_API = "http://localhost:6001"
 VISION_API = "http://localhost:8000"
 
 # Test configuration
