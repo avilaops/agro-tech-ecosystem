@@ -1,0 +1,365 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agro-tech-ecosystem/contracts/vision.analysis.v1.json",
+  "title": "AI Vision Analysis Results",
+  "description": "Computer vision analysis results from AI-Vision-Agriculture and CanaSwarm-Vision systems",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "analysis_id",
+    "timestamp",
+    "source",
+    "location",
+    "detections"
+  ],
+  "properties": {
+    "analysis_id": {
+      "type": "string",
+      "description": "Unique analysis identifier",
+      "pattern": "^VIS-[A-Z0-9]{12,20}$",
+      "examples": ["VIS-20240220143218-A001", "VIS-DRONE42-202402201432"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of analysis",
+      "format": "date-time",
+      "examples": ["2024-02-20T14:32:18Z"]
+    },
+    "source": {
+      "type": "object",
+      "description": "Source of the imagery",
+      "required": ["device_id", "device_type"],
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "description": "Device that captured the image",
+          "examples": ["DRONE-V123", "BOT-A001", "CAM-FIELD42"]
+        },
+        "device_type": {
+          "type": "string",
+          "description": "Type of capture device",
+          "enum": ["drone", "ground_robot", "fixed_camera", "mobile_camera", "satellite"]
+        },
+        "image_url": {
+          "type": "string",
+          "description": "URL or path to original image",
+          "format": "uri",
+          "examples": ["s3://bucket/images/20240220_143218.jpg", "file:///data/captures/img001.jpg"]
+        },
+        "image_dimensions": {
+          "type": "object",
+          "properties": {
+            "width": {"type": "integer", "minimum": 1},
+            "height": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "description": "Location where image was captured",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "altitude_m": {
+          "type": "number",
+          "description": "Altitude in meters"
+        },
+        "field_id": {
+          "type": "string",
+          "description": "Associated field identifier",
+          "pattern": "^F[0-9]{3}(-[A-Za-z0-9_-]+)?$"
+        },
+        "zone_id": {
+          "type": "string",
+          "description": "Associated zone identifier",
+          "pattern": "^Z[0-9]{3}$"
+        }
+      }
+    },
+    "detections": {
+      "type": "object",
+      "description": "Detected objects and conditions",
+      "properties": {
+        "crop_health": {
+          "type": "object",
+          "description": "Overall crop health assessment",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["healthy", "stressed", "diseased", "damaged"],
+              "description": "Overall health status"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Confidence score (0-1)"
+            },
+            "ndvi": {
+              "type": "number",
+              "description": "Normalized Difference Vegetation Index",
+              "minimum": -1,
+              "maximum": 1,
+              "examples": [0.65, 0.82, 0.45]
+            },
+            "coverage_percent": {
+              "type": "number",
+              "description": "Crop coverage percentage",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "weeds": {
+          "type": "array",
+          "description": "Detected weed instances",
+          "items": {
+            "$ref": "#/definitions/Detection"
+          }
+        },
+        "pests": {
+          "type": "array",
+          "description": "Detected pest instances",
+          "items": {
+            "$ref": "#/definitions/Detection"
+          }
+        },
+        "diseases": {
+          "type": "array",
+          "description": "Detected disease symptoms",
+          "items": {
+            "$ref": "#/definitions/Detection"
+          }
+        },
+        "deficiencies": {
+          "type": "array",
+          "description": "Detected nutrient deficiencies",
+          "items": {
+            "$ref": "#/definitions/Detection"
+          }
+        },
+        "anomalies": {
+          "type": "array",
+          "description": "Other detected anomalies",
+          "items": {
+            "$ref": "#/definitions/Detection"
+          }
+        }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "description": "Analysis statistics",
+      "properties": {
+        "total_detections": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "processing_time_ms": {
+          "type": "integer",
+          "description": "Processing time in milliseconds",
+          "minimum": 0
+        },
+        "model_version": {
+          "type": "string",
+          "description": "AI model version used",
+          "examples": ["yolov8-crop-v2.1", "resnet50-disease-v1.0"]
+        },
+        "confidence_avg": {
+          "type": "number",
+          "description": "Average confidence across all detections",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Automated recommendations based on detections",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "apply_herbicide",
+              "apply_pesticide",
+              "apply_fertilizer",
+              "irrigation_needed",
+              "manual_inspection",
+              "no_action_needed"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "reason": {
+            "type": "string",
+            "description": "Explanation for recommendation"
+          },
+          "affected_area_m2": {
+            "type": "number",
+            "description": "Affected area in square meters",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Detection": {
+      "type": "object",
+      "description": "Individual detection instance",
+      "required": ["class", "confidence", "bounding_box"],
+      "properties": {
+        "class": {
+          "type": "string",
+          "description": "Detected class name",
+          "examples": ["braquiaria", "soy_rust", "nitrogen_deficiency", "sugarcane_borer"]
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Detection confidence (0-1)",
+          "minimum": 0,
+          "maximum": 1,
+          "examples": [0.92, 0.78, 0.85]
+        },
+        "bounding_box": {
+          "type": "object",
+          "description": "Bounding box coordinates (normalized 0-1)",
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Top-left X coordinate (normalized)"
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Top-left Y coordinate (normalized)"
+            },
+            "width": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Width (normalized)"
+            },
+            "height": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Height (normalized)"
+            }
+          }
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity level",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "area_m2": {
+          "type": "number",
+          "description": "Affected area in square meters",
+          "minimum": 0
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional detection-specific metadata",
+          "additionalProperties": true
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "analysis_id": "VIS-20240220143218-A001",
+      "timestamp": "2024-02-20T14:32:18Z",
+      "source": {
+        "device_id": "DRONE-V123",
+        "device_type": "drone",
+        "image_url": "s3://agro-images/20240220_143218.jpg",
+        "image_dimensions": {
+          "width": 4096,
+          "height": 3072
+        }
+      },
+      "location": {
+        "latitude": -22.5678,
+        "longitude": -47.4321,
+        "altitude_m": 50,
+        "field_id": "F001",
+        "zone_id": "Z003"
+      },
+      "detections": {
+        "crop_health": {
+          "status": "stressed",
+          "confidence": 0.87,
+          "ndvi": 0.55,
+          "coverage_percent": 78
+        },
+        "weeds": [
+          {
+            "class": "braquiaria",
+            "confidence": 0.92,
+            "bounding_box": {
+              "x": 0.35,
+              "y": 0.42,
+              "width": 0.15,
+              "height": 0.12
+            },
+            "severity": "high",
+            "area_m2": 125.5
+          }
+        ],
+        "diseases": [
+          {
+            "class": "sugarcane_rust",
+            "confidence": 0.78,
+            "bounding_box": {
+              "x": 0.62,
+              "y": 0.28,
+              "width": 0.08,
+              "height": 0.10
+            },
+            "severity": "medium",
+            "area_m2": 45.2
+          }
+        ]
+      },
+      "statistics": {
+        "total_detections": 12,
+        "processing_time_ms": 342,
+        "model_version": "yolov8-crop-v2.1",
+        "confidence_avg": 0.84
+      },
+      "recommendations": [
+        {
+          "action": "apply_herbicide",
+          "priority": "high",
+          "reason": "High-severity weed infestation detected (braquiaria) covering 125m²",
+          "affected_area_m2": 125.5
+        },
+        {
+          "action": "manual_inspection",
+          "priority": "medium",
+          "reason": "Sugarcane rust detected, requires agronomist assessment",
+          "affected_area_m2": 45.2
+        }
+      ]
+    }
+  ]
+}

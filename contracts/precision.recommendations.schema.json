@@ -1,0 +1,228 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agro-tech-ecosystem/contracts/precision.recommendations.v1.json",
+  "title": "Precision Agriculture Field Recommendations",
+  "description": "Data contract for field zone analysis and agronomic recommendations from Precision-Agriculture-Platform",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "field_id",
+    "crop",
+    "season",
+    "total_area_ha",
+    "zones",
+    "summary"
+  ],
+  "properties": {
+    "field_id": {
+      "type": "string",
+      "description": "Unique identifier for the field",
+      "pattern": "^F[0-9]{3}(-[A-Za-z0-9_-]+)?$",
+      "examples": ["F001", "F001-UsinaGuarani", "F042-PivoCentral"]
+    },
+    "crop": {
+      "type": "string",
+      "description": "Crop type cultivated in this field",
+      "enum": ["Sugarcane", "Corn", "Soy", "Cotton", "Coffee", "Citrus"],
+      "examples": ["Sugarcane"]
+    },
+    "season": {
+      "type": "string",
+      "description": "Growing season identifier",
+      "pattern": "^[0-9]{4}/[0-9]{4}$",
+      "examples": ["2023/2024", "2024/2025"]
+    },
+    "total_area_ha": {
+      "type": "number",
+      "description": "Total field area in hectares",
+      "minimum": 0.1,
+      "maximum": 10000,
+      "examples": [150.5, 220.3]
+    },
+    "zones": {
+      "type": "array",
+      "description": "Management zones within the field",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/definitions/ManagementZone"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Aggregated field statistics",
+      "required": [
+        "total_zones",
+        "avg_profitability_score",
+        "total_estimated_impact_brl"
+      ],
+      "properties": {
+        "total_zones": {
+          "type": "integer",
+          "description": "Number of management zones",
+          "minimum": 1
+        },
+        "avg_profitability_score": {
+          "type": "number",
+          "description": "Average profitability score across all zones",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "total_estimated_impact_brl": {
+          "type": "number",
+          "description": "Total estimated financial impact in BRL/year",
+          "examples": [234500, -120000]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ManagementZone": {
+      "type": "object",
+      "description": "Individual management zone within a field",
+      "required": [
+        "zone_id",
+        "area_ha",
+        "profitability_score",
+        "status",
+        "recommendation",
+        "financial_impact"
+      ],
+      "properties": {
+        "zone_id": {
+          "type": "string",
+          "description": "Unique zone identifier within the field",
+          "pattern": "^Z[0-9]{3}$",
+          "examples": ["Z001", "Z002", "Z042"]
+        },
+        "area_ha": {
+          "type": "number",
+          "description": "Zone area in hectares",
+          "minimum": 0.01,
+          "examples": [45.2, 38.7, 66.6]
+        },
+        "current_yield_tons_ha": {
+          "type": "number",
+          "description": "Current yield in tons per hectare",
+          "minimum": 0,
+          "examples": [55.2, 48.3, 72.1]
+        },
+        "expected_yield_tons_ha": {
+          "type": "number",
+          "description": "Expected yield with improvements in tons per hectare",
+          "minimum": 0,
+          "examples": [75.0, 80.0, 85.0]
+        },
+        "yield_gap_percent": {
+          "type": "number",
+          "description": "Yield gap as percentage",
+          "minimum": 0,
+          "maximum": 100,
+          "examples": [26.4, 39.6, 15.2]
+        },
+        "profitability_score": {
+          "type": "number",
+          "description": "Profitability score from 0-10",
+          "minimum": 0,
+          "maximum": 10,
+          "examples": [8.5, 5.2, 3.1]
+        },
+        "status": {
+          "type": "string",
+          "description": "Zone health status",
+          "enum": ["optimal", "warning", "critical"]
+        },
+        "recommendation": {
+          "type": "object",
+          "description": "Agronomic recommendations for this zone",
+          "required": ["action", "priority", "reason"],
+          "properties": {
+            "action": {
+              "type": "string",
+              "description": "Recommended action",
+              "enum": [
+                "maintain_current_management",
+                "soil_correction",
+                "irrigation_adjustment",
+                "fertilization_adjustment",
+                "pest_control",
+                "consider_reform",
+                "immediate_intervention"
+              ]
+            },
+            "priority": {
+              "type": "string",
+              "description": "Action priority level",
+              "enum": ["low", "medium", "high", "critical"]
+            },
+            "reason": {
+              "type": "string",
+              "description": "Explanation for the recommendation",
+              "minLength": 10,
+              "maxLength": 500
+            }
+          }
+        },
+        "financial_impact": {
+          "type": "object",
+          "description": "Financial impact estimates",
+          "required": ["estimated_loss_or_gain_brl_year"],
+          "properties": {
+            "estimated_loss_or_gain_brl_year": {
+              "type": "number",
+              "description": "Annual financial impact (positive = gain, negative = loss)",
+              "examples": [120000, -85000, 180000]
+            },
+            "intervention_cost_brl": {
+              "type": "number",
+              "description": "One-time intervention cost",
+              "minimum": 0,
+              "examples": [25000, 15000, 35000]
+            },
+            "payback_months": {
+              "type": "integer",
+              "description": "Payback period in months",
+              "minimum": 0,
+              "maximum": 120,
+              "examples": [3, 4, 2]
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "field_id": "F001-UsinaGuarani",
+      "crop": "Sugarcane",
+      "season": "2023/2024",
+      "total_area_ha": 150.5,
+      "zones": [
+        {
+          "zone_id": "Z001",
+          "area_ha": 45.2,
+          "current_yield_tons_ha": 55.2,
+          "expected_yield_tons_ha": 75.0,
+          "yield_gap_percent": 26.4,
+          "profitability_score": 6.5,
+          "status": "warning",
+          "recommendation": {
+            "action": "consider_reform",
+            "priority": "medium",
+            "reason": "Significant yield gap due to soil compaction and nutrient depletion"
+          },
+          "financial_impact": {
+            "estimated_loss_or_gain_brl_year": 120000,
+            "intervention_cost_brl": 25000,
+            "payback_months": 3
+          }
+        }
+      ],
+      "summary": {
+        "total_zones": 3,
+        "avg_profitability_score": 6.3,
+        "total_estimated_impact_brl": 234500
+      }
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agro-tech-ecosystem/contracts/telemetry.v1.json",
+  "title": "AgriBot Telemetry Data",
+  "description": "Real-time telemetry data from agricultural robots (AgriBot-Retrofit, CanaSwarm-MicroBot)",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "device_id",
+    "timestamp",
+    "location",
+    "battery",
+    "status"
+  ],
+  "properties": {
+    "device_id": {
+      "type": "string",
+      "description": "Unique device identifier",
+      "pattern": "^(BOT|SWARM|DRONE)-[A-Z0-9]{4,12}$",
+      "examples": ["BOT-A001", "SWARM-C42A", "DRONE-V123"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp",
+      "format": "date-time",
+      "examples": ["2024-02-20T14:32:18Z", "2024-02-20T14:32:18.123Z"]
+    },
+    "location": {
+      "type": "object",
+      "description": "GPS location data",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "Latitude in decimal degrees",
+          "minimum": -90,
+          "maximum": 90,
+          "examples": [-22.5678, -20.1234]
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude in decimal degrees",
+          "minimum": -180,
+          "maximum": 180,
+          "examples": [-47.4321, -48.9876]
+        },
+        "altitude_m": {
+          "type": "number",
+          "description": "Altitude in meters above sea level",
+          "examples": [650.5, 720.3]
+        },
+        "accuracy_m": {
+          "type": "number",
+          "description": "GPS accuracy radius in meters",
+          "minimum": 0,
+          "examples": [2.5, 5.0, 10.0]
+        },
+        "heading_degrees": {
+          "type": "number",
+          "description": "Compass heading in degrees (0-360)",
+          "minimum": 0,
+          "maximum": 360,
+          "examples": [90, 180, 270]
+        },
+        "speed_km_h": {
+          "type": "number",
+          "description": "Current speed in km/h",
+          "minimum": 0,
+          "maximum": 50,
+          "examples": [2.5, 5.0, 12.3]
+        }
+      }
+    },
+    "battery": {
+      "type": "object",
+      "description": "Battery status",
+      "required": ["level_percent"],
+      "properties": {
+        "level_percent": {
+          "type": "number",
+          "description": "Battery level percentage",
+          "minimum": 0,
+          "maximum": 100,
+          "examples": [85, 42, 15]
+        },
+        "voltage_v": {
+          "type": "number",
+          "description": "Battery voltage in volts",
+          "minimum": 0,
+          "maximum": 100,
+          "examples": [48.5, 24.2, 12.8]
+        },
+        "current_a": {
+          "type": "number",
+          "description": "Current draw in amperes",
+          "minimum": 0,
+          "maximum": 200,
+          "examples": [5.2, 12.8, 42.5]
+        },
+        "temperature_c": {
+          "type": "number",
+          "description": "Battery temperature in Celsius",
+          "minimum": -40,
+          "maximum": 80,
+          "examples": [35.5, 42.3, 28.1]
+        },
+        "estimated_runtime_minutes": {
+          "type": "integer",
+          "description": "Estimated remaining runtime in minutes",
+          "minimum": 0,
+          "maximum": 1440,
+          "examples": [120, 45, 180]
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "Current operational status",
+      "enum": [
+        "idle",
+        "working",
+        "moving",
+        "charging",
+        "error",
+        "maintenance",
+        "offline"
+      ]
+    },
+    "task": {
+      "type": "object",
+      "description": "Current task information",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Unique task identifier",
+          "pattern": "^TASK-[A-Z0-9]{8,16}$",
+          "examples": ["TASK-20240220-001", "TASK-HARVEST-42A"]
+        },
+        "task_type": {
+          "type": "string",
+          "description": "Type of task being performed",
+          "enum": [
+            "harvest",
+            "planting",
+            "spraying",
+            "monitoring",
+            "soil_analysis",
+            "irrigation",
+            "transport",
+            "maintenance"
+          ]
+        },
+        "progress_percent": {
+          "type": "number",
+          "description": "Task completion percentage",
+          "minimum": 0,
+          "maximum": 100,
+          "examples": [25, 50, 75]
+        },
+        "field_id": {
+          "type": "string",
+          "description": "Reference to field being worked",
+          "pattern": "^F[0-9]{3}(-[A-Za-z0-9_-]+)?$",
+          "examples": ["F001", "F042-PivoCentral"]
+        },
+        "zone_id": {
+          "type": "string",
+          "description": "Reference to specific zone being worked",
+          "pattern": "^Z[0-9]{3}$",
+          "examples": ["Z001", "Z042"]
+        }
+      }
+    },
+    "sensors": {
+      "type": "object",
+      "description": "Additional sensor readings",
+      "properties": {
+        "soil_moisture_percent": {
+          "type": "number",
+          "description": "Soil moisture level",
+          "minimum": 0,
+          "maximum": 100,
+          "examples": [45.2, 62.8, 35.1]
+        },
+        "soil_temperature_c": {
+          "type": "number",
+          "description": "Soil temperature in Celsius",
+          "minimum": -10,
+          "maximum": 60,
+          "examples": [22.5, 28.3, 31.2]
+        },
+        "ambient_temperature_c": {
+          "type": "number",
+          "description": "Air temperature in Celsius",
+          "minimum": -20,
+          "maximum": 60,
+          "examples": [25.5, 32.8, 18.3]
+        },
+        "humidity_percent": {
+          "type": "number",
+          "description": "Relative humidity",
+          "minimum": 0,
+          "maximum": 100,
+          "examples": [65, 82, 45]
+        },
+        "light_lux": {
+          "type": "number",
+          "description": "Light intensity in lux",
+          "minimum": 0,
+          "examples": [45000, 85000, 120000]
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "System diagnostics",
+      "properties": {
+        "cpu_usage_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "memory_usage_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "disk_usage_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "network_signal_dbm": {
+          "type": "number",
+          "description": "Network signal strength in dBm",
+          "minimum": -120,
+          "maximum": 0,
+          "examples": [-65, -72, -88]
+        },
+        "errors": {
+          "type": "array",
+          "description": "Active error codes",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["ERR_LOW_BATTERY", "WARN_HIGH_TEMP"]]
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "device_id": "BOT-A001",
+      "timestamp": "2024-02-20T14:32:18Z",
+      "location": {
+        "latitude": -22.5678,
+        "longitude": -47.4321,
+        "altitude_m": 650.5,
+        "accuracy_m": 2.5,
+        "heading_degrees": 90,
+        "speed_km_h": 2.5
+      },
+      "battery": {
+        "level_percent": 85,
+        "voltage_v": 48.5,
+        "current_a": 5.2,
+        "temperature_c": 35.5,
+        "estimated_runtime_minutes": 120
+      },
+      "status": "working",
+      "task": {
+        "task_id": "TASK-20240220-001",
+        "task_type": "harvest",
+        "progress_percent": 45,
+        "field_id": "F001",
+        "zone_id": "Z002"
+      },
+      "sensors": {
+        "soil_moisture_percent": 45.2,
+        "soil_temperature_c": 22.5,
+        "ambient_temperature_c": 25.5,
+        "humidity_percent": 65,
+        "light_lux": 45000
+      },
+      "diagnostics": {
+        "cpu_usage_percent": 45,
+        "memory_usage_percent": 62,
+        "disk_usage_percent": 38,
+        "network_signal_dbm": -65,
+        "errors": []
+      }
+    }
+  ]
+}
