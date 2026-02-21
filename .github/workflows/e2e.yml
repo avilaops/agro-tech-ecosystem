@@ -56,7 +56,7 @@ jobs:
         working-directory: workspace/agro-tech-ecosystem
         run: |
           python -m pip install --upgrade pip
-          pip install requests pytest pytest-timeout tenacity
+          pip install requests pytest pytest-timeout
       
       - name: � Debug docker compose configuration
         working-directory: workspace/agro-tech-ecosystem

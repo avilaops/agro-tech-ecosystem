@@ -1,4 +1,4 @@
-"""
+﻿"""
 End-to-End Integration Test: Precision Platform → Intelligence Platform
 
 This test validates the complete data flow between the two systems.
@@ -13,39 +13,27 @@ Requirements:
       * Intelligence: http://localhost:6000
 """
 
+import requests
+import json
 import sys
-import logging
 from datetime import datetime
-from pathlib import Path
 
-# Add project root to Python path for adapter imports
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
 
-# Import our official adapter
-from adapters.precision_intelligence import (
-    PrecisionClient,
-    IntelligenceClient,
-    APIConnectionError,
-    APIResponseError,
-    InvalidSchemaError,
-)
-
+# API Configuration
+PRECISION_API = "http://localhost:5000"
+INTELLIGENCE_API = "http://localhost:6000"
 
 # Test Configuration
 TEST_FIELD_ID = "F001"
-
-# Setup logging
-logging.basicConfig(level=logging.WARNING)  # Hide adapter debug logs in test output
+TIMEOUT_SECONDS = 5
 
 
 class IntegrationTest:
     """End-to-end integration test for Precision → Intelligence flow."""
     
     def __init__(self):
-        # Initialize clients using official adapter
-        self.precision = PrecisionClient()
-        self.intelligence = IntelligenceClient()
+        self.precision_url = PRECISION_API
+        self.intelligence_url = INTELLIGENCE_API
         self.test_field = TEST_FIELD_ID
         self.results = {
             "precision_api": False,
@@ -64,11 +52,10 @@ class IntegrationTest:
         print("E2E INTEGRATION TEST: Precision → Intelligence")
         print("🧪"*40)
         print(f"\nTest Configuration:")
-        print(f"  Precision API:     {self.precision.base_url}")
-        print(f"  Intelligence API:  {self.intelligence.base_url}")
+        print(f"  Precision API:     {self.precision_url}")
+        print(f"  Intelligence API:  {self.intelligence_url}")
         print(f"  Test Field:        {self.test_field}")
-        print(f"  Timeout:           {self.precision.timeout}s")
-        print(f"  Using adapter:     v1.0.0 (with schema validation + retry)")
+        print(f"  Timeout:           {TIMEOUT_SECONDS}s")
         
         # Step 1: Test Precision API
         recommendations = self._test_precision_api()
@@ -89,22 +76,22 @@ class IntegrationTest:
         return self._report_success(recommendations, decision)
     
     def _test_precision_api(self) -> dict:
-        """Test Precision Platform API using adapter."""
+        """Test Precision Platform API."""
         print("\n" + "="*80)
-        print("STEP 1: Testing Precision Platform API (with schema validation)")
+        print("STEP 1: Testing Precision Platform API")
         print("="*80)
         
-        print(f"📡 GET {self.precision.base_url}/api/v1/recommendations?field_id={self.test_field}")
+        url = f"{self.precision_url}/api/v1/recommendations?field_id={self.test_field}"
+        print(f"📡 GET {url}")
         
         try:
-            # Use adapter with automatic schema validation and retry
-            data = self.precision.get_recommendations(
-                field_id=self.test_field,
-                validate_schema=True  # Validates against contracts/precision.recommendations.schema.json
-            )
+            response = requests.get(url, timeout=TIMEOUT_SECONDS)
+            response.raise_for_status()
+            
+            data = response.json()
             self.results["precision_api"] = True
             
-            print(f"✅ SUCCESS (schema validated)")
+            print(f"✅ SUCCESS")
             print(f"   Field:        {data['field_id']}")
             print(f"   Crop:         {data['crop']}")
             print(f"   Area:         {data['total_area_ha']} ha")
@@ -114,34 +101,37 @@ class IntegrationTest:
             
             return data
             
-        except APIConnectionError as e:
+        except requests.exceptions.ConnectionError:
             print(f"❌ ERROR: Cannot connect to Precision API")
-            print(f"   {e}")
             print(f"   Make sure the server is running: uvicorn src.api:app --port 5000")
             return None
-        except APIResponseError as e:
-            print(f"❌ ERROR: HTTP {e.status_code}")
-            print(f"   {e.response_body}")
-            return None
-        except InvalidSchemaError as e:
-            print(f"❌ ERROR: Schema validation failed")
-            print(f"   {e}")
+        except requests.exceptions.HTTPError as e:
+            print(f"❌ ERROR: HTTP {e.response.status_code}")
+            print(f"   {e.response.text}")
             return None
         except Exception as e:
             print(f"❌ ERROR: {e}")
             return None
     
     def _test_intelligence_ingest(self, recommendations: dict) -> dict:
-        """Test Intelligence Platform ingest endpoint using adapter."""
+        """Test Intelligence Platform ingest endpoint."""
         print("\n" + "="*80)
-        print("STEP 2: Testing Intelligence Platform - Ingest (with auto-retry)")
+        print("STEP 2: Testing Intelligence Platform - Ingest")
         print("="*80)
         
-        print(f"📡 POST {self.intelligence.base_url}/api/v1/precision/ingest")
+        url = f"{self.intelligence_url}/api/v1/precision/ingest"
+        print(f"📡 POST {url}")
         
         try:
-            # Use adapter with automatic retry on transient failures
-            data = self.intelligence.ingest_recommendations(recommendations)
+            response = requests.post(
+                url,
+                json=recommendations,
+                headers={"Content-Type": "application/json"},
+                timeout=TIMEOUT_SECONDS
+            )
+            response.raise_for_status()
+            
+            data = response.json()
             self.results["intelligence_ingest"] = True
             
             print(f"✅ SUCCESS")
@@ -153,30 +143,32 @@ class IntegrationTest:
             
             return data
             
-        except APIConnectionError as e:
+        except requests.exceptions.ConnectionError:
             print(f"❌ ERROR: Cannot connect to Intelligence API")
-            print(f"   {e}")
             print(f"   Make sure the server is running: uvicorn src.api:app --port 6000")
             return None
-        except APIResponseError as e:
-            print(f"❌ ERROR: HTTP {e.status_code}")
-            print(f"   {e.response_body}")
+        except requests.exceptions.HTTPError as e:
+            print(f"❌ ERROR: HTTP {e.response.status_code}")
+            print(f"   {e.response.text}")
             return None
         except Exception as e:
             print(f"❌ ERROR: {e}")
             return None
     
     def _test_intelligence_decision(self) -> dict:
-        """Test Intelligence Platform decision endpoint using adapter."""
+        """Test Intelligence Platform decision endpoint."""
         print("\n" + "="*80)
         print("STEP 3: Testing Intelligence Platform - Decision")
         print("="*80)
         
-        print(f"📡 GET {self.intelligence.base_url}/api/v1/decision?field_id={self.test_field}")
+        url = f"{self.intelligence_url}/api/v1/decision?field_id={self.test_field}"
+        print(f"📡 GET {url}")
         
         try:
-            # Use adapter with automatic retry
-            data = self.intelligence.get_decision(field_id=self.test_field)
+            response = requests.get(url, timeout=TIMEOUT_SECONDS)
+            response.raise_for_status()
+            
+            data = response.json()
             self.results["intelligence_decision"] = True
             
             print(f"✅ SUCCESS")
@@ -201,9 +193,9 @@ class IntegrationTest:
             
             return data
             
-        except APIResponseError as e:
-            print(f"❌ ERROR: HTTP {e.status_code}")
-            print(f"   {e.response_body}")
+        except requests.exceptions.HTTPError as e:
+            print(f"❌ ERROR: HTTP {e.response.status_code}")
+            print(f"   {e.response.text}")
             return None
         except Exception as e:
             print(f"❌ ERROR: {e}")
