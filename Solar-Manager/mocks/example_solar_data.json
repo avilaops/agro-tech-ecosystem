@@ -1,0 +1,151 @@
+{
+  "timestamp": "2026-02-20T15:30:00.000Z",
+  "station_id": "SOLAR-STATION-001",
+  "location": {
+    "name": "Fazenda São José - Estação de Recarga Principal",
+    "lat": -22.7150,
+    "lon": -47.6500,
+    "timezone": "America/Sao_Paulo"
+  },
+  "solar_panels": {
+    "array_id": "ARRAY-001",
+    "total_panels": 24,
+    "panel_specs": {
+      "model": "Canadian Solar HiKu7 CS7N-670MS",
+      "power_rating_w": 670,
+      "efficiency_percent": 21.6,
+      "area_m2": 3.1,
+      "voltage_vmp": 38.4,
+      "current_imp": 17.45
+    },
+    "total_capacity_kwp": 16.08,
+    "current_generation": {
+      "power_kw": 12.45,
+      "voltage_v": 920.0,
+      "current_a": 13.5,
+      "efficiency_percent": 77.4,
+      "performance_ratio": 0.89
+    },
+    "environmental_conditions": {
+      "irradiance_w_m2": 850,
+      "panel_temperature_c": 42,
+      "ambient_temperature_c": 28,
+      "wind_speed_m_s": 3.2,
+      "cloud_cover_percent": 15,
+      "sun_elevation_deg": 58
+    },
+    "daily_stats": {
+      "energy_generated_kwh": 78.5,
+      "peak_power_kw": 14.2,
+      "peak_time": "12:35",
+      "average_efficiency_percent": 75.8,
+      "sunshine_hours": 8.5
+    }
+  },
+  "battery_storage": {
+    "battery_id": "BATTERY-BANK-001",
+    "technology": "LiFePO4",
+    "specs": {
+      "nominal_voltage_v": 384,
+      "capacity_ah": 500,
+      "energy_capacity_kwh": 192,
+      "max_charge_rate_c": 1.0,
+      "max_discharge_rate_c": 2.0,
+      "cycle_life": 6000,
+      "warranty_years": 10
+    },
+    "current_state": {
+      "state_of_charge_percent": 85,
+      "state_of_health_percent": 96,
+      "voltage_v": 395.2,
+      "current_a": 28.5,
+      "power_kw": 11.26,
+      "temperature_c": 32,
+      "charge_discharge_status": "charging"
+    },
+    "usage_stats": {
+      "cycles_completed": 450,
+      "total_energy_charged_kwh": 86400,
+      "total_energy_discharged_kwh": 77760,
+      "round_trip_efficiency_percent": 90,
+      "estimated_remaining_cycles": 5550
+    }
+  },
+  "grid_connection": {
+    "connected": false,
+    "grid_voltage_v": 0,
+    "grid_frequency_hz": 0,
+    "import_power_kw": 0,
+    "export_power_kw": 0,
+    "daily_import_kwh": 0,
+    "daily_export_kwh": 0,
+    "net_metering": false
+  },
+  "load_management": {
+    "total_load_kw": 2.85,
+    "robot_charging": {
+      "active_robots": 1,
+      "robots": [
+        {
+          "robot_id": "MICROBOT-001",
+          "charging_status": "fast_charging",
+          "battery_soc_percent": 45,
+          "charge_power_kw": 2.5,
+          "estimated_full_time_minutes": 35,
+          "charge_port": "PORT-1"
+        }
+      ]
+    },
+    "facility_load_kw": 0.35,
+    "available_power_kw": 9.60
+  },
+  "energy_forecast": {
+    "next_hour": {
+      "expected_generation_kwh": 11.8,
+      "confidence_percent": 92,
+      "conditions": "sunny"
+    },
+    "today_remaining": {
+      "expected_generation_kwh": 18.5,
+      "sunrise": "06:15",
+      "sunset": "18:45",
+      "remaining_sunshine_hours": 3.25
+    },
+    "tomorrow": {
+      "expected_generation_kwh": 68.2,
+      "conditions": "partly_cloudy",
+      "sunrise": "06:16",
+      "sunset": "18:44"
+    }
+  },
+  "alerts": [
+    {
+      "alert_id": "ALERT-001",
+      "type": "info",
+      "severity": "low",
+      "message": "Panel temperature elevated due to high irradiance",
+      "timestamp": "2026-02-20T15:25:00.000Z",
+      "acknowledged": false
+    }
+  ],
+  "charging_schedule": {
+    "scheduled_charges": [
+      {
+        "robot_id": "MICROBOT-002",
+        "scheduled_start": "2026-02-20T16:00:00.000Z",
+        "estimated_duration_minutes": 45,
+        "priority": "medium",
+        "current_soc_percent": 55,
+        "target_soc_percent": 95
+      },
+      {
+        "robot_id": "SUPPORTBOT-001",
+        "scheduled_start": "2026-02-20T16:30:00.000Z",
+        "estimated_duration_minutes": 30,
+        "priority": "low",
+        "current_soc_percent": 68,
+        "target_soc_percent": 90
+      }
+    ]
+  }
+}

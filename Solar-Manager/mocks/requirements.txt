@@ -1,0 +1,11 @@
+# Solar-Manager - Dependencies
+# Mock implementation uses only Python stdlib (json, random, datetime, pathlib)
+# No external dependencies required for mock
+# 
+# For production:
+# pymodbus==3.3.2  # Modbus communication with inverters/BMS
+# influxdb-client==1.36.1  # Time-series database for energy data
+# paho-mqtt==1.6.1  # MQTT for real-time telemetry
+# numpy==1.24.3  # Numerical calculations
+# pandas==2.0.3  # Data analysis
+# scikit-learn==1.3.0  # ML for energy forecasting
