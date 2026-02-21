@@ -1,0 +1,405 @@
+{
+  "telemetry_session_id": "TELEM-SESSION-20260220-154500",
+  "timestamp": "2026-02-20T15:45:00.000Z",
+  "collection_interval_seconds": 5,
+  "fleet_snapshot": {
+    "total_robots": 8,
+    "active_robots": 5,
+    "idle_robots": 3,
+    "charging_robots": 1,
+    "mission_types": {
+      "harvesting": 3,
+      "transporting": 1,
+      "inspecting": 1,
+      "idle": 3
+    }
+  },
+  "robots_telemetry": [
+    {
+      "robot_id": "MICROBOT-001",
+      "type": "harvester",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7150,
+        "lon": -47.6500,
+        "altitude_m": 550,
+        "heading_deg": 90,
+        "speed_ms": 0.5
+      },
+      "battery": {
+        "soc_percent": 48,
+        "voltage_v": 48.2,
+        "current_a": 12.5,
+        "temperature_c": 38,
+        "charging": true,
+        "charge_power_kw": 2.5,
+        "estimated_range_km": 3.8,
+        "cycles_count": 145
+      },
+      "sensors": {
+        "gps": {"status": "active", "accuracy_m": 0.05, "satellites": 18},
+        "imu": {
+          "roll_deg": 1.2,
+          "pitch_deg": -0.8,
+          "yaw_deg": 90.3,
+          "accel_x": 0.02,
+          "accel_y": -0.01,
+          "accel_z": 9.81
+        },
+        "lidar": {"status": "active", "range_m": 50, "points_per_second": 300000},
+        "camera_front": {"status": "active", "fps": 30, "resolution": "1920x1080"},
+        "camera_rear": {"status": "active", "fps": 30, "resolution": "1920x1080"},
+        "ultrasonic_front": {"distance_cm": 85, "status": "clear"},
+        "ultrasonic_rear": {"distance_cm": 120, "status": "clear"},
+        "temperature_motor": {"value_c": 55, "status": "normal"},
+        "temperature_controller": {"value_c": 42, "status": "normal"}
+      },
+      "actuators": {
+        "left_motor": {"speed_rpm": 120, "power_w": 450, "status": "active"},
+        "right_motor": {"speed_rpm": 118, "power_w": 445, "status": "active"},
+        "harvester_blade": {"speed_rpm": 0, "power_w": 0, "status": "idle"},
+        "steering": {"angle_deg": -2.5, "status": "active"}
+      },
+      "mission": {
+        "mission_id": "MISSION-F001-Z001-20260220",
+        "status": "charging",
+        "progress_percent": 35,
+        "waypoint_current": 28,
+        "waypoint_total": 80,
+        "area_covered_ha": 1.8,
+        "area_remaining_ha": 3.3
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 45,
+        "memory_usage_percent": 62,
+        "disk_usage_percent": 38,
+        "network_latency_ms": 25,
+        "uptime_hours": 8.5
+      },
+      "alerts": [
+        {
+          "alert_id": "ALERT-MB001-001",
+          "severity": "info",
+          "type": "battery_low",
+          "message": "Bateria abaixo de 50%, iniciando recarga",
+          "timestamp": "2026-02-20T15:40:00.000Z",
+          "acknowledged": true
+        }
+      ]
+    },
+    {
+      "robot_id": "MICROBOT-002",
+      "type": "harvester",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7125,
+        "lon": -47.6490,
+        "altitude_m": 548,
+        "heading_deg": 180,
+        "speed_ms": 1.8
+      },
+      "battery": {
+        "soc_percent": 78,
+        "voltage_v": 50.8,
+        "current_a": -28.5,
+        "temperature_c": 45,
+        "charging": false,
+        "charge_power_kw": 0,
+        "estimated_range_km": 6.2,
+        "cycles_count": 132
+      },
+      "sensors": {
+        "gps": {"status": "active", "accuracy_m": 0.03, "satellites": 20},
+        "imu": {"roll_deg": -0.5, "pitch_deg": 2.1, "yaw_deg": 180.8},
+        "lidar": {"status": "active", "range_m": 50, "points_per_second": 300000},
+        "camera_front": {"status": "active", "fps": 30},
+        "camera_rear": {"status": "active", "fps": 30}
+      },
+      "mission": {
+        "mission_id": "MISSION-F001-Z002-20260220",
+        "status": "harvesting",
+        "progress_percent": 62,
+        "waypoint_current": 50,
+        "waypoint_total": 80,
+        "area_covered_ha": 3.1,
+        "area_remaining_ha": 1.9
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 78,
+        "memory_usage_percent": 71,
+        "uptime_hours": 12.3
+      },
+      "alerts": []
+    },
+    {
+      "robot_id": "MICROBOT-003",
+      "type": "harvester",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7110,
+        "lon": -47.6485,
+        "altitude_m": 546,
+        "heading_deg": 45,
+        "speed_ms": 0.0
+      },
+      "battery": {
+        "soc_percent": 55,
+        "voltage_v": 49.5,
+        "current_a": -2.1,
+        "temperature_c": 32,
+        "charging": false,
+        "estimated_range_km": 4.4,
+        "cycles_count": 158
+      },
+      "mission": {
+        "mission_id": null,
+        "status": "idle",
+        "progress_percent": 0
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 12,
+        "memory_usage_percent": 35,
+        "uptime_hours": 14.8
+      },
+      "alerts": []
+    },
+    {
+      "robot_id": "MICROBOT-004",
+      "type": "harvester",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7180,
+        "lon": -47.6510,
+        "altitude_m": 552,
+        "heading_deg": 270,
+        "speed_ms": 1.5
+      },
+      "battery": {
+        "soc_percent": 82,
+        "voltage_v": 51.2,
+        "current_a": -25.8,
+        "temperature_c": 43,
+        "charging": false,
+        "estimated_range_km": 6.5,
+        "cycles_count": 127
+      },
+      "mission": {
+        "mission_id": "MISSION-F001-Z003-20260220",
+        "status": "harvesting",
+        "progress_percent": 45,
+        "waypoint_current": 36,
+        "waypoint_total": 80
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 82,
+        "memory_usage_percent": 68,
+        "uptime_hours": 11.2
+      },
+      "alerts": []
+    },
+    {
+      "robot_id": "SUPPORTBOT-001",
+      "type": "transport",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7160,
+        "lon": -47.6505,
+        "altitude_m": 551,
+        "heading_deg": 135,
+        "speed_ms": 2.2
+      },
+      "battery": {
+        "soc_percent": 68,
+        "voltage_v": 47.8,
+        "current_a": -18.5,
+        "temperature_c": 40,
+        "charging": false,
+        "estimated_range_km": 8.2,
+        "cycles_count": 98
+      },
+      "cargo": {
+        "load_kg": 450,
+        "capacity_kg": 800,
+        "utilization_percent": 56.3
+      },
+      "mission": {
+        "mission_id": "TRANSPORT-001-20260220",
+        "status": "transporting",
+        "origin": "FIELD-Z002",
+        "destination": "STORAGE-001",
+        "progress_percent": 72
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 35,
+        "memory_usage_percent": 48,
+        "uptime_hours": 9.5
+      },
+      "alerts": []
+    },
+    {
+      "robot_id": "SUPPORTBOT-002",
+      "type": "transport",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7190,
+        "lon": -47.6515,
+        "altitude_m": 553,
+        "heading_deg": 0,
+        "speed_ms": 0.0
+      },
+      "battery": {
+        "soc_percent": 42,
+        "voltage_v": 46.2,
+        "current_a": -1.2,
+        "temperature_c": 35,
+        "charging": false,
+        "estimated_range_km": 5.0,
+        "cycles_count": 112
+      },
+      "cargo": {
+        "load_kg": 0,
+        "capacity_kg": 800,
+        "utilization_percent": 0
+      },
+      "mission": {
+        "mission_id": null,
+        "status": "idle"
+      },
+      "health": {
+        "overall_status": "warning",
+        "cpu_usage_percent": 15,
+        "memory_usage_percent": 38,
+        "uptime_hours": 13.2
+      },
+      "alerts": [
+        {
+          "alert_id": "ALERT-SB002-001",
+          "severity": "warning",
+          "type": "battery_low",
+          "message": "Bateria em 42%, recomendado recarga",
+          "timestamp": "2026-02-20T15:42:00.000Z",
+          "acknowledged": false
+        }
+      ]
+    },
+    {
+      "robot_id": "MAINTENANCEBOT-001",
+      "type": "maintenance",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7150,
+        "lon": -47.6502,
+        "altitude_m": 550,
+        "heading_deg": 0,
+        "speed_ms": 0.0
+      },
+      "battery": {
+        "soc_percent": 88,
+        "voltage_v": 51.8,
+        "current_a": -0.5,
+        "temperature_c": 28,
+        "charging": false,
+        "estimated_range_km": 7.0,
+        "cycles_count": 45
+      },
+      "mission": {
+        "mission_id": null,
+        "status": "idle"
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 8,
+        "memory_usage_percent": 22,
+        "uptime_hours": 6.5
+      },
+      "alerts": []
+    },
+    {
+      "robot_id": "INSPECTIONBOT-001",
+      "type": "inspection",
+      "timestamp": "2026-02-20T15:45:00.000Z",
+      "position": {
+        "lat": -22.7105,
+        "lon": -47.6478,
+        "altitude_m": 545,
+        "heading_deg": 315,
+        "speed_ms": 1.0
+      },
+      "battery": {
+        "soc_percent": 91,
+        "voltage_v": 52.1,
+        "current_a": -8.5,
+        "temperature_c": 35,
+        "charging": false,
+        "estimated_range_km": 9.1,
+        "cycles_count": 67
+      },
+      "sensors": {
+        "thermal_camera": {"status": "active", "fps": 15, "resolution": "640x480"},
+        "multispectral": {"status": "active", "bands": 5, "resolution": "1280x960"}
+      },
+      "mission": {
+        "mission_id": "INSPECTION-Z001-20260220",
+        "status": "inspecting",
+        "progress_percent": 28,
+        "area_covered_ha": 0.7,
+        "area_remaining_ha": 1.8
+      },
+      "health": {
+        "overall_status": "healthy",
+        "cpu_usage_percent": 52,
+        "memory_usage_percent": 58,
+        "uptime_hours": 7.2
+      },
+      "alerts": []
+    }
+  ],
+  "aggregated_metrics": {
+    "fleet_health": {
+      "healthy_count": 7,
+      "warning_count": 1,
+      "critical_count": 0,
+      "offline_count": 0
+    },
+    "battery": {
+      "average_soc_percent": 68.6,
+      "min_soc_percent": 42,
+      "max_soc_percent": 91,
+      "charging_robots": 1,
+      "low_battery_count": 2
+    },
+    "missions": {
+      "active_missions": 5,
+      "idle_robots": 3,
+      "total_area_covered_today_ha": 12.5,
+      "total_area_remaining_ha": 8.9,
+      "average_progress_percent": 42.4
+    },
+    "performance": {
+      "average_cpu_percent": 40.9,
+      "average_memory_percent": 50.3,
+      "average_uptime_hours": 10.4,
+      "average_network_latency_ms": 28
+    },
+    "alerts": {
+      "total_alerts": 2,
+      "critical": 0,
+      "warning": 1,
+      "info": 1,
+      "unacknowledged": 1
+    }
+  },
+  "system_health": {
+    "telemetry_collector_status": "healthy",
+    "data_pipeline_latency_ms": 125,
+    "storage_usage_percent": 42,
+    "message_queue_depth": 15,
+    "dropped_messages_count": 0,
+    "last_collection_timestamp": "2026-02-20T15:45:00.000Z"
+  }
+}
