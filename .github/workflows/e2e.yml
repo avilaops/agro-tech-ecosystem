@@ -10,37 +10,41 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e-precision-intelligence:
     name: E2E - Precision → Intelligence
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
+    permissions:
+      contents: read
+    
     steps:
       - name: 📥 Checkout agro-tech-ecosystem
         uses: actions/checkout@v4
         with:
-          path: agro-tech-ecosystem
+          path: workspace/agro-tech-ecosystem
       
       - name: 📥 Checkout Precision-Agriculture-Platform
         uses: actions/checkout@v4
         with:
           repository: avilaops/Precision-Agriculture-Platform
-          path: Precision-Agriculture-Platform
+          path: workspace/Precision-Agriculture-Platform
           token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: 📥 Checkout CanaSwarm-Intelligence
         uses: actions/checkout@v4
         with:
           repository: avilaops/CanaSwarm-Intelligence
-          path: CanaSwarm-Intelligence
+          path: workspace/CanaSwarm-Intelligence
           token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: 🐋 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            network=host
       
       - name: 🐍 Set up Python 3.11
         uses: actions/setup-python@v5
@@ -49,29 +53,49 @@ jobs:
           cache: 'pip'
       
       - name: 📦 Install E2E test dependencies
+        working-directory: workspace/agro-tech-ecosystem
         run: |
-          pip install --user requests pytest pytest-timeout
+          python -m pip install --upgrade pip
+          pip install requests pytest pytest-timeout
       
       - name: 🚀 Start services with Docker Compose
-        working-directory: agro-tech-ecosystem
+        working-directory: workspace/agro-tech-ecosystem
+        env:
+          DOCKER_BUILDKIT: '1'
         run: |
           docker compose -f docker-compose.e2e.yml up -d --build
-          echo "Services started, waiting for health checks..."
+          docker compose -f docker-compose.e2e.yml ps
       
       - name: ⏳ Wait for services to be healthy
-        working-directory: agro-tech-ecosystem
+        working-directory: workspace/agro-tech-ecosystem
         timeout-minutes: 3
         run: |
           MAX_ATTEMPTS=60
           ATTEMPT=0
+          
+          # Get container IDs from docker compose (robust, works regardless of container names)
+          PRECISION_ID=$(docker compose -f docker-compose.e2e.yml ps -q precision-api)
+          INTELLIGENCE_ID=$(docker compose -f docker-compose.e2e.yml ps -q intelligence-api)
+          
+          if [ -z "$PRECISION_ID" ] || [ -z "$INTELLIGENCE_ID" ]; then
+            echo "❌ Could not resolve container IDs from docker compose."
+            docker compose -f docker-compose.e2e.yml ps
+            docker compose -f docker-compose.e2e.yml logs
+            exit 1
+          fi
+          
+          echo "Container IDs resolved:"
+          echo "  Precision API: $PRECISION_ID"
+          echo "  Intelligence API: $INTELLIGENCE_ID"
+          echo ""
           
           while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
             ATTEMPT=$((ATTEMPT+1))
             echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
             
             # Check if both services report healthy
-            PRECISION_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' precision-api-e2e 2>/dev/null || echo "unknown")
-            INTELLIGENCE_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' intelligence-api-e2e 2>/dev/null || echo "unknown")
+            PRECISION_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "$PRECISION_ID" 2>/dev/null || echo "unknown")
+            INTELLIGENCE_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "$INTELLIGENCE_ID" 2>/dev/null || echo "unknown")
             
             echo "  Precision API: $PRECISION_HEALTH"
             echo "  Intelligence API: $INTELLIGENCE_HEALTH"
@@ -90,27 +114,24 @@ jobs:
           exit 1
       
       - name: 🧪 Run E2E Integration Test
-        working-directory: agro-tech-ecosystem
+        working-directory: workspace/agro-tech-ecosystem
         timeout-minutes: 3
         run: |
           python integration/test_precision_to_intelligence.py
       
       - name: 📋 Show container logs (on failure)
         if: failure()
-        working-directory: agro-tech-ecosystem
+        working-directory: workspace/agro-tech-ecosystem
         run: |
           echo "=== Docker Compose Status ==="
           docker compose -f docker-compose.e2e.yml ps
           echo ""
-          echo "=== Precision API Logs ==="
-          docker compose -f docker-compose.e2e.yml logs precision-api
-          echo ""
-          echo "=== Intelligence API Logs ==="
-          docker compose -f docker-compose.e2e.yml logs intelligence-api
+          echo "=== Container Logs ==="
+          docker compose -f docker-compose.e2e.yml logs
       
       - name: 🛑 Stop services
         if: always()
-        working-directory: agro-tech-ecosystem
+        working-directory: workspace/agro-tech-ecosystem
         run: |
           docker compose -f docker-compose.e2e.yml down -v
       
@@ -120,24 +141,6 @@ jobs:
         with:
           name: e2e-logs
           path: |
-            agro-tech-ecosystem/integration/*.log
+            workspace/agro-tech-ecosystem/integration/*.log
           retention-days: 7
           if-no-files-found: ignore
-  
-  health-report:
-    name: 📈 Integration Health Report
-    runs-on: ubuntu-latest
-    needs: e2e-precision-intelligence
-    if: always()
-    
-    steps:
-      - name: 📊 Report Status
-        run: |
-          if [ "${{ needs.e2e-precision-intelligence.result }}" == "success" ]; then
-            echo "✅ Ecosystem Integration: HEALTHY"
-            echo "All critical data flows validated successfully."
-          else
-            echo "❌ Ecosystem Integration: DEGRADED"
-            echo "E2E tests failed. Check logs for details."
-            exit 1
-          fi
