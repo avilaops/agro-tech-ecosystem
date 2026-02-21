@@ -10,6 +10,8 @@ from datetime import datetime
 from typing import Dict, Any
 import webbrowser
 
+from .output import normalize_priority
+
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -338,6 +340,19 @@ def generate_html_report(
     # Extract data
     decision = results.get("steps", {}).get("decision", {}).get("data", {})
     vision_data = results.get("steps", {}).get("vision", {}).get("data", {})
+    
+    # Normalize priority field for template compatibility
+    if "priority" in decision:
+        priority_raw = decision["priority"]
+        # Create normalized priority dict for easier Jinja2 access
+        priority_normalized = normalize_priority(priority_raw)
+        # Convert to dot-accessible object for Jinja2 template
+        class PriorityObj:
+            def __init__(self, data):
+                self.level = data["level"]
+                self.score = data["score"]
+                self.reason = data["reason"]
+        decision["priority"] = PriorityObj(priority_normalized)
     
     # Prepare template data
     template_data = {

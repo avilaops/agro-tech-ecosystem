@@ -9,10 +9,48 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import box
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 
 console = Console()
+
+
+def normalize_priority(priority: Union[str, dict, None]) -> dict:
+    """
+    Normalize priority field to consistent dict format.
+    
+    Handles multiple input formats:
+    - String: "critical" → {"level": "critical", "score": 0, "reason": ""}
+    - Dict: {"level": "high", "score": 8.5} → unchanged
+    - None/empty: {} → {"level": "unknown", "score": 0, "reason": ""}
+    
+    Args:
+        priority: Priority data in various formats
+        
+    Returns:
+        Normalized dict with level, score, and reason keys
+    """
+    if isinstance(priority, dict):
+        # Already a dict, ensure it has all keys with defaults
+        return {
+            "level": priority.get("level", "unknown"),
+            "score": priority.get("score", 0),
+            "reason": priority.get("reason", "")
+        }
+    elif isinstance(priority, str):
+        # String format (from API response)
+        return {
+            "level": priority.lower(),
+            "score": 0,  # Unknown score when only level provided
+            "reason": ""
+        }
+    else:
+        # None or unexpected type
+        return {
+            "level": "unknown",
+            "score": 0,
+            "reason": ""
+        }
 
 
 def print_demo_header():
@@ -109,8 +147,11 @@ def print_vision_summary(data: dict):
 def print_intelligence_ingest(data: dict, source: str):
     """Print Intelligence ingest results."""
     if source == "precision":
-        priority = data.get("priority", {})
-        console.print(f"\n[bold]Priority:[/bold] {priority.get('level', '').upper()}")
+        # Normalize priority field (handles string or dict format)
+        priority_raw = data.get("priority")
+        priority = normalize_priority(priority_raw)
+        
+        console.print(f"\n[bold]Priority:[/bold] {priority['level'].upper()}")
         console.print(f"[bold]ROI:[/bold] R$ {data.get('estimated_roi_brl_year', 0):,.0f}/year")
     elif source == "vision":
         console.print(f"\n[bold]Total detections:[/bold] {data.get('total_detections', 0)}")
@@ -123,13 +164,17 @@ def print_intelligence_ingest(data: dict, source: str):
 def print_decision_summary(decision: dict):
     """Print final decision summary."""
     field_id = decision.get("field_id")
-    priority = decision.get("priority", {})
+    
+    # Normalize priority field (handles string or dict format)
+    priority_raw = decision.get("priority")
+    priority = normalize_priority(priority_raw)
+    
     zones = decision.get("zones", [])
     next_steps = decision.get("next_steps", [])
     
     # Priority panel
-    priority_level = priority.get("level", "unknown")
-    priority_score = priority.get("score", 0)
+    priority_level = priority["level"]
+    priority_score = priority["score"]
     priority_color = {
         "critical": "red",
         "high": "yellow",
@@ -140,7 +185,7 @@ def print_decision_summary(decision: dict):
     console.print("\n")
     console.print(Panel(
         f"[{priority_color}]{priority_level.upper()}[/{priority_color}] ({priority_score:.1f}/10)\n"
-        f"[dim]{priority.get('reason', '')}[/dim]\n\n"
+        f"[dim]{priority['reason']}[/dim]\n\n"
         f"[bold green]Total ROI:[/bold green] R$ {decision.get('estimated_roi_brl_year', 0):,.0f}/year",
         title=f"🧠 DECISION SUMMARY - {field_id}",
         border_style=priority_color
